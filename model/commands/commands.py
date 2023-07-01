@@ -18,7 +18,8 @@ from selenium_metaprogramming.model.commands.click import Click
 from selenium_metaprogramming.model.commands.print import Print
 from selenium_metaprogramming.model.commands.get import Get
 from selenium_metaprogramming.model.commands.sleep import Sleep
+from selenium_metaprogramming.model.commands.send_keys import SendKeys
 
 
 # --- classes ---
-ScriptCommandMap = {command.name: command for command in [Get, Click, Print, Sleep]}
+ScriptCommandMap = {command.name: command for command in [Get, Click, Print, Sleep, SendKeys]}
