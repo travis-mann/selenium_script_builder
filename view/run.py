@@ -13,9 +13,8 @@ __status__ = "Development"
 
 
 # --- imports ---
-from typing import Dict
+from selenium_metaprogramming.view.theme import *
 from PyQt5.QtWidgets import *
-import sys
 
 
 # --- classes ---
@@ -31,10 +30,12 @@ class RunView(QWidget):
 
         # add run button
         self.run_button = QPushButton("Run Script")
+        self.run_button.setStyleSheet(BUTTON_STYLE)
         layout.addWidget(self.run_button)
 
         # add cancel button
         self.cancel_button = QPushButton("Cancel")
+        self.cancel_button.setStyleSheet(BUTTON_STYLE)
         layout.addWidget(self.cancel_button)
 
         # add log window
@@ -44,6 +45,7 @@ class RunView(QWidget):
 
         # add build button
         self.build_button = QPushButton("Build")
+        self.build_button.setStyleSheet(BUTTON_STYLE)
         layout.addWidget(self.build_button)
 
         # package

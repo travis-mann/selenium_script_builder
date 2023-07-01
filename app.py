@@ -13,11 +13,21 @@ __status__ = "Development"
 
 
 # --- imports ---
+# build MVC
 from selenium_metaprogramming.view.build import BuildView
-from selenium_metaprogramming.view.run import RunView
+from selenium_metaprogramming.controller.build_controller import BuildController
 
-from PyQt5.QtWidgets import *
+# run MVC
+from selenium_metaprogramming.view.run import RunView
+from selenium_metaprogramming.model.commands.commands import ScriptCommandMap
+
+# other
+from selenium_metaprogramming.view.theme import *
+
+# other libraries
 import sys
+import traceback
+from PyQt5.QtWidgets import *
 
 
 # --- main ---
@@ -26,21 +36,19 @@ class BuilderApp(QMainWindow):
         # initialize QMainWindow
         super().__init__()
 
-        # set title
-        self.setWindowTitle("Selenium Metaprogramming")
-
-        # set window geometry
+        # style window
+        self.setWindowTitle("Selenium Script Builder")
         self.setGeometry(100, 100, 600, 400)
+        self.setStyleSheet(BACKGROUND_STYLE)
 
         # create central widget to swap views
         self.central_widget = QStackedWidget()
         self.setCentralWidget(self.central_widget)
 
-        # connect actions to views and store
+        # connect controller actions with view elements
         # build view
-        self.build_view = BuildView(['Click', 'Send Keys', 'Get', 'Sleep'])
+        self.build_view = BuildView(ScriptCommandMap.keys())
         self.central_widget.addWidget(self.build_view)
-        self.build_view.compile_button.clicked.connect(self.compile_script)
 
         # run view
         self.run_view = RunView()
@@ -48,18 +56,14 @@ class BuilderApp(QMainWindow):
         self.run_view.run_button.clicked.connect(self.run_script)
         self.run_view.build_button.clicked.connect(self.to_build_view)
 
+        # add controllers
+        self.build_controller = BuildController(self)
+
         # start in build mode
         self.to_build_view()
 
         # display application
         self.show()
-
-    def to_run_view(self):
-        """
-        purpose: switch to run view and run currently built script
-        """
-        print('opening run view')
-        self.central_widget.setCurrentWidget(self.run_view)
 
     def to_build_view(self):
         """
@@ -68,26 +72,19 @@ class BuilderApp(QMainWindow):
         print('opening build view')
         self.central_widget.setCurrentWidget(self.build_view)
 
-    def compile_script(self):
-        """
-        purpose: compile currently built script
-        """
-        # compile script to run
-        print('compiling current script')
-
-        # convert stored commands into python code
-        # store code in an output folder
-        # script runner will grab most recent script
-
-        # move to run view
-        self.to_run_view()
-
     def run_script(self):
         """
         purpose: run currently built script
         """
-        print('running current script')
+        # get script
+        script = self.build_controller.script
 
+        print(f'running {script.name} script')
+        try:
+            exec(script.compiled_script)
+        except Exception as e:
+            print(f'failed to run {script.name} due to {type(e)}: {e}\n{traceback.format_exc()}')
+        print(f'{script.name} complete')
         # spawn a thread to run the script
         # pipe stdout back into log output
         # disable buttons until complete
@@ -103,4 +100,8 @@ if __name__ == "__main__":
     G = BuilderApp()
 
     # start app
-    sys.exit(App.exec())
+    try:
+        App.exec()
+    except Exception as e:
+        print(f'failed to run app due to {type(e)}: {e}\n{traceback.format_exc()}')
+    sys.exit()
