@@ -24,15 +24,25 @@ class SendKeys(Command):
     purpose: click element by xpath
     """
     name = 'Send Keys'
-    hint = 'XPATH; Str'
+    hint = 'XPATH; Str/Keys.KEY_NAME'
 
     def __init__(self):
         super(SendKeys, self).__init__()
 
     def compile(self) -> Tuple[str, List[str]]:
-        # https://stackoverflow.com/questions/18886596/replace-all-quotes-in-a-string-with-escaped-quotes
-        command = f"driver.find_element(By.XPATH, {json.dumps(self.args[0])}).send_keys({json.dumps(self.args[1])})"
+        # start imports list
         imports = ['from selenium.webdriver.common.by import By']
+
+        # check if send_keys arg is a string or key
+        if 'Keys.' in self.args[1]:
+            send_keys_arg = self.args[1]
+            imports.append('from selenium.webdriver.common.keys import Keys')
+        else:
+            send_keys_arg = json.dumps(self.args[1])
+
+        # https://stackoverflow.com/questions/18886596/replace-all-quotes-in-a-string-with-escaped-quotes
+        command = f"driver.find_element(By.XPATH, {json.dumps(self.args[0])}).send_keys({send_keys_arg})"
+
         return command, imports
 
     def validate(self, args: List[str]) -> bool:

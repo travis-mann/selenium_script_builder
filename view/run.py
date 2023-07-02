@@ -29,13 +29,14 @@ class RunView(QWidget):
         layout = QVBoxLayout()
 
         # add run button
-        self.run_button = QPushButton("Run Script")
-        self.run_button.setStyleSheet(BUTTON_STYLE)
+        self.run_button = QPushButton()  # button text updated when switching views
+        self.run_button.setStyleSheet(STYLE)
         layout.addWidget(self.run_button)
 
         # add cancel button
         self.cancel_button = QPushButton("Cancel")
-        self.cancel_button.setStyleSheet(BUTTON_STYLE)
+        self.cancel_button.setStyleSheet(STYLE)
+        self.cancel_button.setEnabled(False)  # start disabled, enabled with script start
         layout.addWidget(self.cancel_button)
 
         # add log window
@@ -45,7 +46,7 @@ class RunView(QWidget):
 
         # add build button
         self.build_button = QPushButton("Build")
-        self.build_button.setStyleSheet(BUTTON_STYLE)
+        self.build_button.setStyleSheet(STYLE)
         layout.addWidget(self.build_button)
 
         # package

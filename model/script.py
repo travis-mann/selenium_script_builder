@@ -88,8 +88,17 @@ class Script:
         self.compiled = False
 
     def remove_command(self, idx: int) -> None:
-        print(f'removing command at index {idx}')
+        # log action
+        print(f'removing {self.commands[idx].name} command at index {idx}')
+
+        # remove item at given index
+        del self.commands[idx]
+
+        # reset compiled tracker since script was updated
         self.compiled = False
+
+        # log success
+        print('command removed')
 
     def start_script(self, import_strs: List[str]) -> str:
         """
