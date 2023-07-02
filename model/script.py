@@ -125,3 +125,23 @@ driver.maximize_window()
         purpose: commands required to end a selenium script
         """
         return """driver.quit()"""
+
+    def store(self, file_path: str):
+        """
+        purpose: store uncompiled script as JSON for later use
+        """
+        # log action
+        print(f'storing script at {file_path}')
+
+        # to implement later
+        raise NotImplementedError('Script.store has not been implemented yet')
+
+    def load(self, file_path: str):
+        """
+        purpose: store uncompiled script as JSON for later use
+        """
+        # log action
+        print(f'loading script from {file_path}')
+
+        # to implement later
+        raise NotImplementedError('Script.load has not been implemented yet')

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""build.py: build view widget for application"""
+"""build_view.py: build view widget for application"""
 
 # --- metadata ---
 __author__ = "Travis Mann"

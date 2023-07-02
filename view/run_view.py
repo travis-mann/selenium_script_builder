@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""run.py: run view widget for application"""
+"""run_view.py: run view widget for application"""
 
 
 # --- metadata ---

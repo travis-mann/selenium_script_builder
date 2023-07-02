@@ -40,6 +40,10 @@ class Get(Command):
             return False
 
         # check if arg is a valid url
+        # allow urls without http specifiers
+        if args[0][0:4] == 'www.':
+            args[0] = 'https://' + args[0]
+
         # https://stackoverflow.com/questions/7160737/how-to-validate-a-url-in-python-malformed-or-not
         if validators.url(args[0]):
             return True

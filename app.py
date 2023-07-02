@@ -14,11 +14,11 @@ __status__ = "Development"
 
 # --- imports ---
 # build MVC
-from selenium_metaprogramming.view.build import BuildView
+from selenium_metaprogramming.view.build_view import BuildView
 from selenium_metaprogramming.controller.build_controller import BuildController
 
 # run MVC
-from selenium_metaprogramming.view.run import RunView
+from selenium_metaprogramming.view.run_view import RunView
 from selenium_metaprogramming.controller.run_controller import RunController
 
 # other
