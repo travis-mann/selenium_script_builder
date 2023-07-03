@@ -59,23 +59,21 @@ class RunController:
         """
         purpose: switch run button for cancel button
         """
-        print('switching run for cancel'),
-        self.main_window.run_view.run_button.setEnabled(False),  # disable button before switching function
-        self.main_window.run_view.run_button.setText("Cancel"),  # update text to new button function
-        self.main_window.run_view.run_button.clicked.disconnect(),  # disconnect script run action
-        self.main_window.run_view.run_button.clicked.connect(self.stop_script),  # connect new button action
-        self.main_window.run_view.run_button.setEnabled(True),  # re-enable button
+        self.main_window.run_view.run_button.setEnabled(False)  # disable button before switching function
+        self.main_window.run_view.run_button.setText("Cancel")  # update text to new button function
+        self.main_window.run_view.run_button.clicked.disconnect()  # disconnect script run action
+        self.main_window.run_view.run_button.clicked.connect(self.stop_script)  # connect new button action
+        self.main_window.run_view.run_button.setEnabled(True)  # re-enable button
 
     def get_run_button(self):
         """
         purpose: switch cancel button for run button
         """
-        print('switching cancel for run'),
-        self.main_window.run_view.run_button.setEnabled(False),  # disable button before switching function
-        self.main_window.run_view.run_button.setText(f"Run {self.script.name}"),  # update button text to run action
-        self.main_window.run_view.run_button.clicked.disconnect(),  # disconnect script cancel action
-        self.main_window.run_view.run_button.clicked.connect(self.run_script),  # connect new button action
-        self.main_window.run_view.run_button.setEnabled(True),  # re-enable button
+        self.main_window.run_view.run_button.setEnabled(False)  # disable button before switching function
+        self.main_window.run_view.run_button.setText(f"Run {self.script.name}")  # update button text to run action
+        self.main_window.run_view.run_button.clicked.disconnect()  # disconnect script cancel action
+        self.main_window.run_view.run_button.clicked.connect(self.run_script)  # connect new button action
+        self.main_window.run_view.run_button.setEnabled(True)  # re-enable button
 
     def start_script_log(self):
         """
@@ -98,12 +96,17 @@ class RunController:
             self.main_window.run_view.log_output.insertPlainText(text)
         ])
 
-        # connect start and end signals
+        # connect receiver thread to start actions
         self.receiver_thread.started.connect(lambda: self.set_std_out(WriteStream(queue)))
         self.receiver_thread.started.connect(self.receiver.run)  # run stdout receiver
+
+        # connect receiver to end actions
         self.receiver.finished.connect(self.receiver.deleteLater)  # delete receiver worker
         self.receiver.finished.connect(self.receiver_thread.quit)  # signal thread to end
         self.receiver.finished.connect(lambda: self.set_std_out(original_stdout))  # reset std out
+
+        # connect receiver thread to end actions
+        self.receiver_thread.finished.connect(lambda: print('ending receiver thread'))
         self.receiver_thread.finished.connect(self.receiver_thread.deleteLater)  # delete receiver thread
 
         # prepare thread
@@ -113,10 +116,14 @@ class RunController:
     def set_std_out(self, new_std_out):
         sys.stdout = new_std_out
 
-    @pyqtSlot()
-    def start_script_thread(self):
+    def run_script(self):
+        """
+        purpose: run currently built script
+        """
         # get script
         self.script = self.main_window.build_controller.script
+
+        self.start_script_log()  # start pipe to QTextEdit window
 
         # create a script worker and child thread
         self.worker_thread = QThread()
@@ -124,9 +131,9 @@ class RunController:
         self.worker.moveToThread(self.worker_thread)
 
         # connect worker thread start actions
-        self.worker_thread.started.connect(lambda: self.main_window.run_view.build_button.setEnabled(False))  # disable to build button
+        self.worker_thread.started.connect(
+            lambda: self.main_window.run_view.build_button.setEnabled(False))  # disable to build button
         self.worker_thread.started.connect(self.get_cancel_button)  # swap run for cancel
-        self.worker_thread.started.connect(self.receiver_thread.start)  # start pipe to QTextEdit window
         self.worker_thread.started.connect(self.worker.run_script)  # run script
 
         # connect worker end actions
@@ -135,17 +142,12 @@ class RunController:
         self.worker.finished.connect(self.receiver.finished.emit)  # end pipe to QTextEdit window
 
         # connect worker thread end actions
+        self.worker_thread.finished.connect(lambda: print('ending worker thread'))
         self.worker_thread.finished.connect(self.worker_thread.deleteLater)  # delete thread
-        self.worker_thread.finished.connect(lambda: self.main_window.run_view.build_button.setEnabled(True))  # re-enable to build button
+        self.worker_thread.finished.connect(
+            lambda: self.main_window.run_view.build_button.setEnabled(True))  # re-enable to build button
         self.worker_thread.finished.connect(self.get_run_button)  # swap cancel for run
 
         # start thread
         print('starting worker thread')
         self.worker_thread.start()
-
-    def run_script(self):
-        """
-        purpose: run currently built script
-        """
-        self.start_script_log()
-        self.start_script_thread()
