@@ -19,7 +19,7 @@ from selenium_metaprogramming.controller.log.queue_stream import WriteStream
 
 import sys
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import QThread
+from PyQt5.QtCore import QThread, pyqtSlot
 from PyQt5.QtGui import QTextCursor
 from queue import Queue
 
@@ -51,8 +51,8 @@ class RunController:
         self.main_window.run_view.run_button.setEnabled(False)
 
         # kill thread
-        if self.thread.isRunning():
-            self.thread.exit()
+        if self.worker_thread.isRunning():
+            self.worker_thread.exit()
             print('script stopped')
 
     def get_cancel_button(self):
@@ -77,7 +77,7 @@ class RunController:
         self.main_window.run_view.run_button.clicked.connect(self.run_script),  # connect new button action
         self.main_window.run_view.run_button.setEnabled(True),  # re-enable button
 
-    def prepare_script_log(self):
+    def start_script_log(self):
         """
         purpose: handle moving stdout from the script to the log output
         """
@@ -86,90 +86,66 @@ class RunController:
 
         # set up worker and thread
         queue = Queue()
-        sys.stdout = WriteStream(queue)
-        self.reciever_thread = QThread()
-        self.reciever = ScriptReceiver(queue)
+        self.receiver_thread = QThread()
+        self.receiver = ScriptReceiver(queue)
 
-        # connect start and end signals
-        self.reciever_thread.started.connect(self.reciever.run)
-        self.worker.finished.connect(self.thread.quit)
-        self.worker.finished.connect(self.worker.deleteLater)
-        self.thread.finished.connect(self.thread.deleteLater)
+        # track original stdout to reset after receiver is finished
+        original_stdout = sys.stdout
 
         # connect actions
-        self.reciever.textReceived.connect(lambda text: [
-                                         print(text),
-                                         self.main_window.run_view.log_output.moveCursor(QTextCursor.End),
-                                         self.main_window.run_view.log_output.insertPlainText(text),
-                                     ])
+        self.receiver.textReceived.connect(lambda text: [
+            self.main_window.run_view.log_output.moveCursor(QTextCursor.End),
+            self.main_window.run_view.log_output.insertPlainText(text)
+        ])
+
+        # connect start and end signals
+        self.receiver_thread.started.connect(lambda: self.set_std_out(WriteStream(queue)))
+        self.receiver_thread.started.connect(self.receiver.run)  # run stdout receiver
+        self.receiver.finished.connect(self.receiver.deleteLater)  # delete receiver worker
+        self.receiver.finished.connect(self.receiver_thread.quit)  # signal thread to end
+        self.receiver.finished.connect(lambda: self.set_std_out(original_stdout))  # reset std out
+        self.receiver_thread.finished.connect(self.receiver_thread.deleteLater)  # delete receiver thread
 
         # prepare thread
-        self.reciever.moveToThread(self.reciever_thread)
+        self.receiver.moveToThread(self.receiver_thread)
+        self.receiver_thread.start()
 
-    def end_script_log(self):
-        """
-        purpose: kill receiver and thread
-        """
-        print('ending script log')
-        self.reciever_thread.quit()
-        self.reciever.deleteLater()
-        self.reciever_thread.deleteLater()
+    def set_std_out(self, new_std_out):
+        sys.stdout = new_std_out
+
+    @pyqtSlot()
+    def start_script_thread(self):
+        # get script
+        self.script = self.main_window.build_controller.script
+
+        # create a script worker and child thread
+        self.worker_thread = QThread()
+        self.worker = ScriptWorker(self.script)
+        self.worker.moveToThread(self.worker_thread)
+
+        # connect worker thread start actions
+        self.worker_thread.started.connect(lambda: self.main_window.run_view.build_button.setEnabled(False))  # disable to build button
+        self.worker_thread.started.connect(self.get_cancel_button)  # swap run for cancel
+        self.worker_thread.started.connect(self.receiver_thread.start)  # start pipe to QTextEdit window
+        self.worker_thread.started.connect(self.worker.run_script)  # run script
+
+        # connect worker end actions
+        self.worker.finished.connect(self.worker_thread.quit)  # delete thread
+        self.worker.finished.connect(self.worker.deleteLater)  # delete worker
+        self.worker.finished.connect(self.receiver.finished.emit)  # end pipe to QTextEdit window
+
+        # connect worker thread end actions
+        self.worker_thread.finished.connect(self.worker_thread.deleteLater)  # delete thread
+        self.worker_thread.finished.connect(lambda: self.main_window.run_view.build_button.setEnabled(True))  # re-enable to build button
+        self.worker_thread.finished.connect(self.get_run_button)  # swap cancel for run
+
+        # start thread
+        print('starting worker thread')
+        self.worker_thread.start()
 
     def run_script(self):
         """
         purpose: run currently built script
         """
-        # get script
-        self.script = self.main_window.build_controller.script
-
-        # create a script worker and child thread
-        self.thread = QThread()
-        self.worker = ScriptWorker(self.script)
-        self.worker.moveToThread(self.thread)
-
-        # prepare text receiver thread
-        self.prepare_script_log()
-
-        # connect signals and slots
-        # connect thread start actions
-        print('connecting worker thread start actions')
-        self.thread.started.connect(
-            lambda: [
-                # disable switching to build view
-                self.main_window.run_view.build_button.setEnabled(False),
-                # switch run button to cancel button
-                self.get_cancel_button(),
-                # start log output receiver
-                self.reciever_thread.start(),
-                # start script worker
-                self.worker.run_script(),
-            ]
-        )
-
-        print('connecting worker finished actions')
-        # end thread and destroy worker when done
-        self.thread.finished.connect(
-            lambda: [
-                self.thread.quit(),
-                self.worker.deleteLater(),
-            ]
-        )
-
-        print('connecting worker thread finished actions')
-        # reset gui after thread is done
-        self.thread.finished.connect(
-            lambda: [
-                # delete thread
-                self.thread.deleteLater(),
-                # re-enable switching to build view
-                self.main_window.run_view.build_button.setEnabled(True),
-                # switch cancel button back to run button
-                self.get_run_button(),
-                # end log receiver
-                self.end_script_log()
-            ]
-        )
-
-        # start child thread
-        print('starting worker thread')
-        self.thread.start()
+        self.start_script_log()
+        self.start_script_thread()

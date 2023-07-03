@@ -16,7 +16,7 @@ __status__ = "Development"
 from selenium_metaprogramming.model.script import Script
 
 import traceback
-from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 
 
 # --- classes ---
@@ -27,6 +27,7 @@ class ScriptWorker(QObject):
         super(ScriptWorker, self).__init__()
         self.script = script
 
+    @pyqtSlot()
     def run_script(self):
         """run compiled python script"""
         # log action

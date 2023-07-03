@@ -70,7 +70,7 @@ class Script:
         python_code += self.end_script()
 
         # show output
-        print(f'compiled code:\n{python_code}')
+        print(f'compiled code:\n{"-"*20}\n{python_code}\n{"-"*20}')
         self.compiled = True
         self.compiled_script = python_code
 

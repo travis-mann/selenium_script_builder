@@ -20,6 +20,7 @@ from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 # https://stackoverflow.com/questions/21071448/redirecting-stdout-and-stderr-to-a-pyqt4-qtextedit-from-a-secondary-thread
 class ScriptReceiver(QObject):
     textReceived = pyqtSignal(str)
+    finished = pyqtSignal()
 
     def __init__(self,queue,*args,**kwargs):
         QObject.__init__(self,*args,**kwargs)

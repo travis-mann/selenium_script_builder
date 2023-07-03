@@ -35,7 +35,7 @@ class RunView(QWidget):
 
         # add log window
         self.log_output = QTextEdit()
-        self.log_output.setReadOnly(True)
+        # self.log_output.setReadOnly(True)
         layout.addWidget(self.log_output)
 
         # add build button
