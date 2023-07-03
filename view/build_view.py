@@ -11,7 +11,7 @@ __email__ = "tmann.eng@gmail.com"
 __status__ = "Development"
 
 # --- imports ---
-from selenium_metaprogramming.view.theme import *
+from selenium_script_builder.view.theme import *
 
 from typing import List
 from PyQt5.QtWidgets import *

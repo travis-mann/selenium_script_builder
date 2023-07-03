@@ -13,7 +13,7 @@ __status__ = "Development"
 
 
 # --- imports ---
-from selenium_metaprogramming.model.script import Script
+from selenium_script_builder.model.script import Script
 
 import traceback
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot

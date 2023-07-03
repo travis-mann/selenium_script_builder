@@ -13,9 +13,9 @@ __status__ = "Development"
 
 
 # --- imports ---
-from selenium_metaprogramming.controller.script_worker import ScriptWorker
-from selenium_metaprogramming.controller.log.script_reciever import ScriptReceiver
-from selenium_metaprogramming.controller.log.queue_stream import WriteStream
+from selenium_script_builder.controller.script_worker import ScriptWorker
+from selenium_script_builder.controller.log.script_reciever import ScriptReceiver
+from selenium_script_builder.controller.log.queue_stream import WriteStream
 
 import sys
 from PyQt5.QtWidgets import *
@@ -122,7 +122,6 @@ class RunController:
         """
         # get script
         self.script = self.main_window.build_controller.script
-
         self.start_script_log()  # start pipe to QTextEdit window
 
         # create a script worker and child thread

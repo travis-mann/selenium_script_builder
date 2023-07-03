@@ -11,7 +11,7 @@ __email__ = "tmann.eng@gmail.com"
 __status__ = "Development"
 
 # --- imports ---
-from selenium_metaprogramming.model.commands.command import Command
+from selenium_script_builder.model.commands.command import Command
 
 import validators
 from typing import List, Tuple

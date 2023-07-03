@@ -13,7 +13,7 @@ __status__ = "Development"
 
 
 # --- imports ---
-from selenium_metaprogramming.view.theme import *
+from selenium_script_builder.view.theme import *
 from PyQt5.QtWidgets import *
 
 

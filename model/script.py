@@ -12,7 +12,7 @@ __status__ = "Development"
 
 
 # --- imports ---
-from selenium_metaprogramming.model.commands.command import Command
+from selenium_script_builder.model.commands.command import Command
 
 from typing import List
 

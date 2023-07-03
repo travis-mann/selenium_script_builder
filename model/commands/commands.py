@@ -14,11 +14,11 @@ __status__ = "Development"
 
 # --- imports ---
 from enum import Enum
-from selenium_metaprogramming.model.commands.click import Click
-from selenium_metaprogramming.model.commands.print import Print
-from selenium_metaprogramming.model.commands.get import Get
-from selenium_metaprogramming.model.commands.sleep import Sleep
-from selenium_metaprogramming.model.commands.send_keys import SendKeys
+from selenium_script_builder.model.commands.click import Click
+from selenium_script_builder.model.commands.print import Print
+from selenium_script_builder.model.commands.get import Get
+from selenium_script_builder.model.commands.sleep import Sleep
+from selenium_script_builder.model.commands.send_keys import SendKeys
 
 
 # --- classes ---

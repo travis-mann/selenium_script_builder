@@ -13,10 +13,10 @@ __status__ = "Development"
 
 
 # --- imports ---
-from selenium_metaprogramming.model.script import Script
-from selenium_metaprogramming.model.commands.click import Command
-from selenium_metaprogramming.model.commands.commands import ScriptCommandMap
-from selenium_metaprogramming.view.theme import *
+from selenium_script_builder.model.script import Script
+from selenium_script_builder.model.commands.click import Command
+from selenium_script_builder.model.commands.commands import ScriptCommandMap
+from selenium_script_builder.view.theme import *
 
 import traceback
 from typing import List
