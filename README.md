@@ -3,7 +3,7 @@ Interactive GUI tool to create simple Python Selenium scripts. Well suited for a
 
 
 # Setup
-1. Ensure [git]([url](https://git-scm.com/)) and [Python 3.8+]([url](https://www.python.org/downloads/)) are installed
+1. Ensure [Git](https://git-scm.com/) version control and [Python 3.8+](https://www.python.org/downloads/) are installed
 2. Run the following terminal commands in the project folder
 ```
 git init
