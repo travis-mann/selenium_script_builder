@@ -60,7 +60,7 @@ class BuildController:
         """
         purpose: add selected command in ui to script model and update view
         """
-        print('adding command')
+        print('attempting to add selected command')
 
         # get command from ui
         command_to_add = self.get_command()
@@ -71,18 +71,26 @@ class BuildController:
             # add command to script
             self.script.add_command(command_to_add, args)
 
-            # reset formatting and relevant fields
+            # reset formatting and relevant fields which may have shown warnings
             self.reset_args()
             self.main_window.build_view.command_list.setProperty('warning', False)
             self.main_window.build_view.command_list.style().unpolish(self.main_window.build_view.command_list)
             self.main_window.build_view.command_list.style().polish(self.main_window.build_view.command_list)
+
+            # update command list
+            self.update_command_list()
+
+            # log success
+            print(f'{command_to_add.name} command added')
+
         else:  # invalid args
+            # update css to highlight args field
             self.main_window.build_view.args_field.setProperty('warning', True)
             self.main_window.build_view.args_field.style().unpolish(self.main_window.build_view.args_field)
             self.main_window.build_view.args_field.style().polish(self.main_window.build_view.args_field)
 
-        # update command list
-        self.update_command_list()
+            # log failure
+            print(f'{command_to_add.name} command not added')
 
     def get_args(self) -> List[str]:
         """

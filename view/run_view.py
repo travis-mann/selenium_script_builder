@@ -33,12 +33,6 @@ class RunView(QWidget):
         self.run_button.setStyleSheet(STYLE)
         layout.addWidget(self.run_button)
 
-        # add cancel button
-        self.cancel_button = QPushButton("Cancel")
-        self.cancel_button.setStyleSheet(STYLE)
-        self.cancel_button.setEnabled(False)  # start disabled, enabled with script start
-        layout.addWidget(self.cancel_button)
-
         # add log window
         self.log_output = QTextEdit()
         self.log_output.setReadOnly(True)
